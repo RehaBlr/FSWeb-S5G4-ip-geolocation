@@ -68,27 +68,90 @@ async function ipAdresimiAl() {
 */
 
 //kodlar buraya gelecek
-const benimUrl = "https://apis.ergineer.com/ipgeoapi/81.213.177.224";
-const da = axios //
-  .get(benimUrl)
-  .then((res) => bilgi(res.data)) //console.log(res.data)
-  .catch((error) => console.log(error));
+// // const benimUrl = "https://apis.ergineer.com/ipgeoapi/81.213.177.224";
+// // const da = axios //
+// //   .get(benimUrl)
+// //   .then((res) => bilgi(res.data)) //console.log(res.data)
+// //   .catch((error) => console.log(error));
 
-console.log(da, ipAdresimiAl());
+// // console.log(da, ipAdresimiAl());
 
-function bilgi(obj) {
-  const html = `<div class="card">
-  <img src="https://iplookup.flagfox.net/images/h16/${obj.ülkeKodu}.png" />
+// // function bilgi(obj) {
+// //   const html = `<div class="card">
+// //   <img src="https://iplookup.flagfox.net/images/h16/${obj.ülkeKodu}.png" />
+// //   <div class="card-info">
+// // 	  <h3 class="ip">${obj.sorgu}</h3>
+// // 	  <p class="ulke">${obj.ülke} (${obj.ülkeKodu})</p>
+// // 	  <p>Enlem: ${obj.enlem} Boylam: ${obj.boylam}</p>
+// // 	  <p>Şehir: ${obj.şehir}</p>
+// // 	  <p>Saat dilimi: ${obj.saatdilimi}</p>
+// // 	  <p>Para birimi: ${obj.parabirimi}</p>
+// // 	  <p>ISP: ${obj.isp}</p>
+// //   </div>
+// //   </div>`;
+// //   document.querySelector(".cards").innerHTML = html;
+// //   //   return html
+// // }
+
+const myIp = "54.175.104.147";
+
+const cardsContainer = document.querySelector(".cards");
+
+function cardCreator(cardInfo) {
+  const {
+    sorgu,
+    enlem,
+    boylam,
+    saatdilimi,
+    parabirimi,
+    isp,
+    şehir: city,
+    ülkeKodu: countryCode,
+  } = cardInfo;
+
+  const htmlCard = `<div class="card">
+  <img src="https://iplookup.flagfox.net/images/h16/${countryCode}.png" />
   <div class="card-info">
-	  <h3 class="ip">${obj.sorgu}</h3>
-	  <p class="ulke">${obj.ülke} (${obj.ülkeKodu})</p>
-	  <p>Enlem: ${obj.enlem} Boylam: ${obj.boylam}</p>
-	  <p>Şehir: ${obj.şehir}</p>
-	  <p>Saat dilimi: ${obj.saatdilimi}</p>
-	  <p>Para birimi: ${obj.parabirimi}</p>
-	  <p>ISP: ${obj.isp}</p>
+	  <h3 class="ip">${sorgu}</h3>
+	  <p class="ulke">${countryCode}</p>
+	  <p>Enlem: ${enlem} Boylam: ${boylam}</p>
+	  <p>Şehir: ${city}</p>
+	  <p>Saat dilimi: ${saatdilimi}</p>
+	  <p>Para birimi: ${parabirimi}</p>
+	  <p>ISP: ${isp}</p>
   </div>
   </div>`;
-  document.querySelector(".cards").innerHTML = html;
-  //   return html
+
+  return htmlCard;
 }
+
+let myInfoObj = {};
+console.log("myInfoObj 1", myInfoObj);
+async function lokasyonBilgilerimiAl(ipAdd) {
+  await axios
+    .get(`https://apis.ergineer.com/ipgeoapi/${ipAdd}`)
+    .then(function (response) {
+      // handle success
+      console.log("data olala", response.data);
+      myInfoObj = response.data;
+    })
+    .catch(function (error) {
+      // handle error
+      console.log(error);
+    })
+    .finally(function () {
+      console.log("myInfoObj 2", myInfoObj);
+      cardsContainer.innerHTML = cardCreator(myInfoObj);
+      // always executed
+    });
+}
+
+async function initAPICycle() {
+  await ipAdresimiAl();
+  // IP adresim çalışınca globaldeki benimIP bdeğişkenini güncelliyor.
+  //GÜNCELLENENE KADAR DA AWAIT BEKLETIYOR
+
+  lokasyonBilgilerimiAl(benimIP);
+}
+
+initAPICycle();
